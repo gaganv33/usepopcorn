@@ -4,7 +4,7 @@
 
 .data{
     display: grid;
-    height: 83vh;
+    min-height: 83vh;
     background-color: black;
     text-align: center;
     padding: 1rem;

@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import "./App.css";
 import Navbar from "./Components/Navbar";
 import Display from "./Components/Display";
+import List from "./Components/List";
+import ListWatched from "./Components/ListWatched";
+import ItemWatch from "./Components/ItemWatch";
+import Item from "./Components/Item";
 
 const tempMovieData = [
     {
@@ -55,19 +59,34 @@ export default function App(){
     const [data, setData] = useState(tempMovieData);
     const [watch, setWatch] = useState(tempWatchedData);
     const [isDataOpen, setIsDataOpen] = useState(true);
-    const [stats, setStats] = useState({
-        count : 2,
-        imdbRating  : 8.65,
-        userRating : 9.5,
-        totalWatchMin : 145
-    });
     const [isWatchOpen, setIsWatchOpen] = useState(true);
+
+    let averageUserRating = 0;
+    let averageImdbRating = 0;
+    let toalRuntime = 0;
+
+    tempWatchedData.map((singleData) => {
+      toalRuntime += singleData.runtime;
+      averageImdbRating += singleData.imdbRating;
+      averageUserRating += singleData.userRating;
+      return singleData;
+    })
+
+    averageImdbRating = averageImdbRating / tempWatchedData.length;
+    averageUserRating = averageUserRating / tempWatchedData.length;
 
     return (
         <div className="app">
             <Navbar count={data.length} search={search} setSearch={setSearch} />
             <div className="data">
-                <Display data={data} watch={watch} isDataOpen={isDataOpen} setIsDataOpen={setIsDataOpen} stats={stats} isWatchOpen={isWatchOpen} setIsWatchOpen={setIsWatchOpen} />
+                <Display>
+                  <List setIsDataOpen={setIsDataOpen} isDataOpen={isDataOpen}>
+                    <Item data={data} />
+                  </List>
+                  <ListWatched count={tempWatchedData.length} averageImdbRating={averageImdbRating} toalRuntime={toalRuntime} averageUserRating={averageUserRating} isWatchOpen={isWatchOpen} setIsWatchOpen={setIsWatchOpen}>
+                    <ItemWatch watch={watch} />
+                  </ListWatched>
+                </Display>
             </div>
         </div>
     )

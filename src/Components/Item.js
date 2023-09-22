@@ -1,16 +1,24 @@
 import React from "react";
 import "./Item.css";
+import StarRating from "./StarRating";
 
-export default function Item({ Poster, Title, Year, imdbID }){
+export default function Item({ data }){
     return (
         <div className="item">
-            <div className="image">
-                <img className="poster" src={Poster} alt="movie" />
-            </div>
-            <div className="movieData">
-                <h3>{Title}</h3>
-                <p>{Year}</p>
-            </div>
+            {
+                data.map((singleData) => (
+                    <>
+                        <div className="image">
+                            <img className="poster" src={singleData.Poster} alt="movie" />
+                        </div>
+                        <div className="movieData">
+                            <h3>{singleData.Title}</h3>
+                            <p>{singleData.Year}</p>
+                            <StarRating size={1.2} color="yellow" />
+                        </div>  
+                    </>
+                ))
+            }
         </div>
     )
 }
