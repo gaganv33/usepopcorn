@@ -1,7 +1,8 @@
 import React from "react";
 import "./ListWatched.css";
+import ItemWatch from "./ItemWatch";
 
-export default function ListWatched({ count, averageImdbRating, toalRuntime, averageUserRating,  isWatchOpen, setIsWatchOpen, children }){
+export default function ListWatched({ count, averageImdbRating, toalRuntime, averageUserRating,  isWatchOpen, setIsWatchOpen, watch, setWatch }){
     function handleCloseButton(){
         setIsWatchOpen((value) => {
             return !value;
@@ -23,7 +24,7 @@ export default function ListWatched({ count, averageImdbRating, toalRuntime, ave
                 </div>
             </div>
             {
-                isWatchOpen ? children : null
+                isWatchOpen ? <ItemWatch watch={watch} setWatch={setWatch} /> : null
             }
         </div>
     )
