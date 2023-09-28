@@ -16,25 +16,34 @@ export default function Selected({ selected, setSelected, setWatch, watch }){
     const [selectedData, setSelectedData] = useState({});
     const [found, setFound] = useState(false);
 
-    const foundData = watch.filter((singleData) => {
-        return singleData.imdbID === selected[0].imdbID;
+    const tempWatch = [...watch];
+
+    const foundData = tempWatch.filter((singleData) => {
+        return singleData.imdbID === selected;
     });
     
     useEffect(function (){
+        const controller = new AbortController();
         async function fetchInformation(){
             try{
                 setIsLoading(true);
                 setErrorMsg("");
-                const title = selected.at(0).Title;
-                const res = await fetch(`http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&t=${title}&plot=full`);
+                console.log(selected);
+                const res = await fetch(`http://www.omdbapi.com/?i=${selected}&apikey=${KEY}&plot=full`,{
+                    signal: controller.signal,
+                });
                 const data = await res.json();
                 if(data.Response === 'False'){
                     throw new Error(data.Error);
                 }
+                console.log(data);
                 setSelectedData(data);
+                setErrorMsg("");
             }
             catch(err){
-                setErrorMsg(err.message);
+                if(err.name !== "AbortError"){
+                    setErrorMsg(err.message);
+                }
             }
             finally{
                 setIsLoading(false);
@@ -47,10 +56,37 @@ export default function Selected({ selected, setSelected, setWatch, watch }){
             setFound(true);
             setSelectedData(foundData[0]);
         }
+        return function(){
+            controller.abort();
+        }
     }, [selected]);
 
+    useEffect(function(){
+        if(!selectedData.Title){
+            return;
+        }
+        document.title = `Movie - ${selectedData.Title}`;
+        return function(){
+            document.title = "usePopcorn";
+        }
+    }, [selectedData]);
+
+    useEffect(function() {
+        function callback(e){
+            if(e.code === "Escape"){
+                setSelected(null);
+            }
+        }
+        document.addEventListener("keydown", callback);
+
+        return function(){
+            document.removeEventListener("keydown", callback);
+        }
+    }, [setSelected]);
+
     function handleBackButton(){
-        setSelected([]);
+        setSelected(null);
+        setSelectedData({});
     }
 
     function handleCloseButton(){
@@ -60,7 +96,7 @@ export default function Selected({ selected, setSelected, setWatch, watch }){
     function handleAddButton(){
         setWatch([...watch, {...selectedData, userRating: selectedRating}]);
         setSelectedData({});
-        setSelected([]);
+        setSelected(null);
     }
 
     return (

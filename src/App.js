@@ -134,7 +134,7 @@ export default function App(){
     const [watch, setWatch] = useState([]);
     const [isDataOpen, setIsDataOpen] = useState(true);
     const [isWatchOpen, setIsWatchOpen] = useState(true);
-    const [selected, setSelected] = useState([]);
+    const [selected, setSelected] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -162,11 +162,14 @@ export default function App(){
     averageUserRating = Math.round(averageUserRating / watch.length, 2);
 
     useEffect(function() {
+      const controller = new AbortController();
       async function fetchMovies(){
         try{
           setLoading(true);
           setError("");
-          const res = await fetch(`http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${search}`);
+          const res = await fetch(`http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${search}`, {
+            signal : controller.signal,
+          });
 
           if (!res.ok){
             throw new Error("Something went wrong with fetching movies");
@@ -177,10 +180,12 @@ export default function App(){
             throw new Error(data.Error);
           }
           setData(data.Search);
+          setError("");
         }
         catch(err){
-          setError(err.message);
-          // setError("❌Something went wrong");
+          if(err.name !== "AbortError"){
+            setError(err.message);
+          }
         }
         finally{
           setLoading(false);
@@ -191,6 +196,9 @@ export default function App(){
         setLoading(false);
         setError(false);
         fetchMovies();
+      }
+      return function(){
+        controller.abort();
       }
     }, [search]);
 
@@ -211,7 +219,7 @@ export default function App(){
                     error && <Error error={error} />
                   }
                   {
-                    (selected.length === 0) ? (<ListWatched count={watch.length} averageImdbRating={averageImdbRating} toalRuntime={toalRuntime} averageUserRating={averageUserRating} isWatchOpen={isWatchOpen} setIsWatchOpen={setIsWatchOpen} watch={watch} setWatch={setWatch} />) : <Selected selected={selected} setSelected={setSelected} setWatch={setWatch} watch={watch} />
+                    (selected === null) ? (<ListWatched count={watch.length} averageImdbRating={averageImdbRating} toalRuntime={toalRuntime} averageUserRating={averageUserRating} isWatchOpen={isWatchOpen} setIsWatchOpen={setIsWatchOpen} watch={watch} setWatch={setWatch} />) : <Selected selected={selected} setSelected={setSelected} setWatch={setWatch} watch={watch} />
                   }
                 </Display>
             </div>

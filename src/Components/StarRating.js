@@ -5,11 +5,12 @@ export default function StarRating({ size = 0.5, color = "red", maxRating = 5, s
     const [tempRating, setTempRating] = useState(0);
 
     const starRatingStyle = {
-        display: "flex",
-        alignItems : "center",
+        display: "grid",
+        gridTemplateColumns: "2fr 1fr",
         gap: "1rem",
         fontSize : `${size}rem`,
         justifyContent: "center",
+        textAlign : "center"
     }
     const containerStyle = {
         display : "flex",

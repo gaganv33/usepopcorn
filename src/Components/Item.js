@@ -3,7 +3,7 @@ import "./Item.css";
 
 export default function Item({ data, setSelected }){
     function handleOnClick(singleData){
-        setSelected([singleData]);
+        setSelected(singleData.imdbID);
     }
 
     return (

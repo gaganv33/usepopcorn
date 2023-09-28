@@ -18,8 +18,8 @@ export default function ListWatched({ count, averageImdbRating, toalRuntime, ave
                 </div>
                 <div className="stats">
                     <span>🎞️ {count} movie</span>
-                    <span>⭐ {averageImdbRating}</span>
-                    <span>✨ {averageUserRating}</span>
+                    <span>⭐ {averageImdbRating ? averageImdbRating: 0}</span>
+                    <span>✨ {averageUserRating ? averageUserRating : 0}</span>
                     <span>⌚ {toalRuntime}</span>
                 </div>
             </div>
