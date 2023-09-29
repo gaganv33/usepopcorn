@@ -19,7 +19,7 @@ export default function Navbar({ count, search, setSearch }){
 		return function() {
 			document.removeEventListener("keydown", callback);
 		}
-	}, []);
+	}, [setSearch]);
 
 	return (
 		<nav className="nav-bar">
