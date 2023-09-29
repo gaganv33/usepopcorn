@@ -16,4 +16,4 @@ export default function Error({ error }){
             <p>{error}</p>
         </div>
     )
-}
+};

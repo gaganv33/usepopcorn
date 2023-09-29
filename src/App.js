@@ -8,7 +8,9 @@ import Item from "./Components/Item";
 import Selected from "./Components/Selected";
 import Loader from "./Components/Loading";
 import Error from "./Components/Error";
+import { useGetMovies } from "./useGetMovies";
 
+/*
 const tempMovieData = [
   {
     imdbID: "tt1375666",
@@ -102,6 +104,7 @@ const tempMovieData = [
     imdbID: "tt0318908",
   },
 ];
+*/
   
 // const tempWatchedData = [
 //     {
@@ -125,18 +128,16 @@ const tempMovieData = [
 //       userRating: 9,
 //     }
 // ];
-
-const KEY = "d6c527a3";
   
 export default function App(){
     const [search, setSearch] = useState("");
-    const [data, setData] = useState(tempMovieData);
-    const [watch, setWatch] = useState([]);
+    const [watch, setWatch] = useState(function (){
+      const storedData = JSON.parse(localStorage.getItem("watched"));
+      return (storedData ? storedData : []);
+    });
     const [isDataOpen, setIsDataOpen] = useState(true);
     const [isWatchOpen, setIsWatchOpen] = useState(true);
     const [selected, setSelected] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
 
     let averageUserRating = 0;
     let averageImdbRating = 0;
@@ -161,46 +162,11 @@ export default function App(){
     averageImdbRating = Math.round(averageImdbRating / watch.length, 2);
     averageUserRating = Math.round(averageUserRating / watch.length, 2);
 
+    const { loading, error, data } = useGetMovies(search);
+
     useEffect(function() {
-      const controller = new AbortController();
-      async function fetchMovies(){
-        try{
-          setLoading(true);
-          setError("");
-          const res = await fetch(`http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${search}`, {
-            signal : controller.signal,
-          });
-
-          if (!res.ok){
-            throw new Error("Something went wrong with fetching movies");
-          }
-          const data = await res.json();
-          console.log(data);
-          if (data.Response === "False"){
-            throw new Error(data.Error);
-          }
-          setData(data.Search);
-          setError("");
-        }
-        catch(err){
-          if(err.name !== "AbortError"){
-            setError(err.message);
-          }
-        }
-        finally{
-          setLoading(false);
-        }
-      }
-
-      if(search.length > 3){
-        setLoading(false);
-        setError(false);
-        fetchMovies();
-      }
-      return function(){
-        controller.abort();
-      }
-    }, [search]);
+      localStorage.setItem("watched", JSON.stringify(watch ? watch : []));
+    }, [watch]);
 
     return (
         <div className="app">
